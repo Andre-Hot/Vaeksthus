@@ -1,6 +1,6 @@
-import RPI:GPIO as GPIO
-gpiozero import PWMLED
-import time
+import RPI.GPIO as GPIO
+from gpiozero import PWMLED
+import time import sleep
 import smbus
 
 
@@ -26,9 +26,10 @@ class MCP3021:
         adc1 = 311
         adc2 = 677
         a = (adc2 - adc1) / 100
-        percentage = ((a - raw_value ) / a)
+        percentage = ((raw_value - adc1) / (adc2 - adc1)) * 100
 
-        percentage = max(100, min (percentage, 0))
+
+        percentage = max(0, min (percentage, 100))
 
         return percentage
  
@@ -59,28 +60,28 @@ try:
         print(moisture)
         print(f"RAw :  {raw}, Moisture: {moisture:.2f}%")
 
-      for duty_cycle in range(0, 100, 1):
-        led.value = duty_cycle/100.0
-        sleep(0.05)
+        for duty_cycle in range(0, 100, 1):
+            led.value = duty_cycle/100.0
+            sleep(0.05)
 
-      for duty_cycle in range(100, 0, -1):
-        led.value = duty_cycle/100.0
-        sleep(0.05)
+        for duty_cycle in range(100, 0, -1):
+            led.value = duty_cycle/100.0
+            sleep(0.05)
       
 
-      if moisture < 30:
-          print("Moisure low")
-          GPIO.output(PUMP_PIN, GPIO.LOW)
+        if moisture < 30:
+            print("Moisure low")
+            GPIO.output(PUMP_PIN, GPIO.LOW)
 
       else :
           print("moisture OK")
           GPIO.output(PUMP_PIN, GPIO.HIGH)
 
-        time.sleep(1)
+     time.sleep(1)
 except KeyboardInterrupt:
-  print("Stopping program and turning off leds")
-  led.value = 0
-  GPIO.cleanup()
+    print("Stopping program and turning off leds")
+    led.value = 0
+    GPIO.cleanup()
 
 
       
